@@ -1,6 +1,73 @@
 ﻿using ProducerConsumerPattern;
-ProducerConsumer producerConsumer = new ProducerConsumer(10,3);
+ProducerConsumer producerConsumer = new ProducerConsumer(5, 2,25);
 producerConsumer.Run();
+
+//Queue<int> stream = new Queue<int>();
+//Random random = new Random();
+//Object o = new Object();
+
+// void Produce()
+//{
+//    int input;
+
+//    while (true)
+//    {
+//        input = random.Next(300, 1000);
+//        Thread.Sleep(input);
+
+//        lock (o)
+//        {
+//            if (stream.Count > 10)
+//                Monitor.PulseAll(o);
+
+//            if (stream.Count > 20)
+//            {
+
+//                Monitor.PulseAll(o);
+//                Monitor.Wait(o);
+//            }
+
+//            stream.Enqueue(input);
+//            Console.WriteLine($"PRODUCE - {stream.Count}");
+//        }
+//    }
+//}
+
+// void Consume()
+//{
+//    while (true)
+//    {
+//        int input = random.Next(300, 1000);
+//        Thread.Sleep(input);
+
+//        lock (o)3
+//        {
+//            if (stream.Count < 10)
+//            {
+//                Monitor.PulseAll(o);
+//                Monitor.Wait(o);
+//            }
+
+//            stream.Dequeue();
+//            Console.WriteLine($"CONSUME  - {stream.Count}");
+//        }
+//    }
+//}
+
+
+//Thread t1 = new Thread(Produce);
+//t1.Name = "Producer";
+
+//Thread t2 = new Thread(Consume);
+//t2.Name = "Consumer";
+
+//t1.Start();
+//t2.Start();
+
+//t1.Join();
+//t2.Join();
+
+
 
 //Queue<int> buffer = new Queue<int>();
 //object o = new object();

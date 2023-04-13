@@ -14,10 +14,12 @@ namespace ProducerConsumerPattern
         private readonly object o = new object();
         public int ProducerCount { get; }
         public int ConsumerCount { get; }
-        public ProducerConsumer(int producerCount, int consumerCount)
+        public int Size { get; set; }
+        public ProducerConsumer(int producerCount, int consumerCount, int size)
         {
             ProducerCount = producerCount;
             ConsumerCount = consumerCount;
+            Size = size;
         }
         public void Run()
         {
@@ -30,6 +32,15 @@ namespace ProducerConsumerPattern
             {
                 item.Start();
             }
+            foreach (var item in producerThreads)
+            {
+                item.Join();
+            }
+            foreach (var item in consumerThreads)
+            {
+                item.Join();
+            }
+
         }
         public void CreateThreads()
         {
@@ -50,54 +61,67 @@ namespace ProducerConsumerPattern
             Random rnd = new Random();
             while (true)
             {
+
                 lock (o)
                 {
-                    int number = rnd.Next(0, 100);
-                    buffer.Enqueue(number);
-                    Console.WriteLine($"{Thread.CurrentThread.Name} {number}");
-                    if (buffer.Count >= 50)
+                    if (buffer.Count == Size)
                     {
-                        Console.WriteLine("Queue is full!!!!!");
-                        Monitor.PulseAll(o);
-                        Monitor.Wait(o);
+                        Console.WriteLine("Full");
+                        for (int i = 0; i < producerThreads.Count; i++)
+                        {
+                            Thread thread = Thread.CurrentThread;
+                            Monitor.Pulse(o);
+                            Monitor.Wait(o);
+
+                        }
                     }
-                  
-                    Thread.Sleep(rnd.Next(0, 1000));
+                    else
+                    {
+                        if (buffer.Count == 0)
+                        {
+                           
+                            Monitor.Pulse(o);
+                        }
+                        buffer.Enqueue(rnd.Next(0, 500));
+                        Console.WriteLine($"{Thread.CurrentThread.Name} {buffer.Count}");
+
+                    }
+
                 }
+                Thread.Sleep(rnd.Next(1000, 1500));
             }
+
         }
         public void Consumer()
         {
             Random rnd = new Random();
             while (true)
             {
+
                 lock (o)
                 {
-                    if (buffer.Count < 40)
-                    {
-                        Monitor.PulseAll(o);
-                    }
                     if (buffer.Count == 0)
                     {
                         Monitor.PulseAll(o);
                         Monitor.Wait(o);
                     }
-                    if (buffer.Count >= 50)
-                    {
-                        while (buffer.Count >= 40)
-                        {
-                            int number = buffer.Dequeue();
-                            Console.WriteLine($"{Thread.CurrentThread.Name} {number}");
-                        }
-                    }
-                    else
-                    {
-                        int number = buffer.Dequeue();
-                        Console.WriteLine($"{Thread.CurrentThread.Name} {number}");
-                    }
-                    Thread.Sleep(rnd.Next(0, 1000));
-                }
 
+                    if (buffer.Count > 0)
+                    {
+                        buffer.Dequeue();
+                        Console.WriteLine($"{Thread.CurrentThread.Name} {buffer.Count}");
+                    }
+
+                }
+                Thread.Sleep(rnd.Next(1000, 1500));
+
+            }
+        }
+        public void WaitAll(List<Thread> threads)
+        {
+            for (int i = 0; i < threads.Count; i++)
+            {
+                Monitor.Wait(o);
             }
         }
     }
